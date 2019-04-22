@@ -1,0 +1,12 @@
+{
+    "name": "open-hospital",
+    "version": "1.0.0",
+    "private": false,
+    "dependencies": {
+      "mysql": "2.3.2",
+      "async": "2.0.1",
+      "connect-timeout": "1.7.0",
+      "node-uuid": "1.4.1",
+      "ioredis": "2.0.1"
+    }
+}
