@@ -1,5 +1,6 @@
 var app = require('./app/application');
 var shutdown = require('./app/log/logger').shutdown;
+var mysql = require('./app/dao/mysql');
 var logger = require('./app/log/logger').getLogger('main');
 
 var HELP_DUMP = '' +
@@ -29,3 +30,8 @@ if (ret === true && app.help) {
         process.exit(0);
     });
 }
+
+logger.info("app start now");
+
+app.loadConfig('mysql', 'mysql.json');
+mysql.init(app['mysql']);
