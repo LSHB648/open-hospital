@@ -1,6 +1,7 @@
 var app = require('./app/application');
 var shutdown = require('./app/log/logger').shutdown;
 var mysql = require('./app/dao/mysql');
+var redisService = require('./app/dao/redisService');
 var logger = require('./app/log/logger').getLogger('main');
 
 var HELP_DUMP = '' +
@@ -18,20 +19,23 @@ var HELP_DUMP = '' +
 var ret = app.init();
 
 if (ret === false) {
-    console.error(HELP_DUMP);
-    shutdown(() => {
-        process.exit(2);
-    });
+  console.error(HELP_DUMP);
+  shutdown(() => {
+    process.exit(2);
+  });
 }
 
 if (ret === true && app.help) {
-    console.info(HELP_DUMP);
-    shutdown(() => {
-        process.exit(0);
-    });
+  console.info(HELP_DUMP);
+  shutdown(() => {
+    process.exit(0);
+  });
 }
 
 logger.info("app start now");
 
 app.loadConfig('mysql', 'mysql.json');
 mysql.init(app['mysql']);
+
+app.loadConfig('redis', 'redis.json');
+redisService.init(app['redis']);

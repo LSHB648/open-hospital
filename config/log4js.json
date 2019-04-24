@@ -1,24 +1,24 @@
 {
-    "appenders": {
-      "console": {
-        "type": "console"
-      },
-      "openHospital": {
-        "type": "dateFile",
-        "filename": "./logs/open-hospital.log",
-        "alwaysIncludePattern": true,
-        "pattern": "-yyyy-MM-dd",
-        "maxLogSize": 10008576
-      }
+  "appenders": {
+    "console": {
+      "type": "console"
     },
-    "categories": {
-      "default": {
-        "appenders": ["console"],
-        "level": "info"
-      },
-      "main": {
-        "appenders": ["openHospital"],
-        "level": "info"
-      }
+    "openHospital": {
+      "type": "dateFile",
+      "filename": "./logs/open-hospital.log",
+      "alwaysIncludePattern": true,
+      "pattern": "-yyyy-MM-dd",
+      "maxLogSize": 10008576
     }
+  },
+  "categories": {
+    "default": {
+      "appenders": ["console"],
+      "level": "info"
+    },
+    "main": {
+      "appenders": ["openHospital"],
+      "level": "info"
+    }
+  }
 }

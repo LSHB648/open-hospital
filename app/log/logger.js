@@ -6,9 +6,9 @@ log4js.configure(logConf);
 var logger = module.exports;
 
 logger.getLogger = (cat) => {
-    return log4js.getLogger(cat);
+  return log4js.getLogger(cat);
 };
 
 logger.shutdown = (cb) => {
-    log4js.shutdown(cb);
+  log4js.shutdown(cb);
 };
