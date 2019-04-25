@@ -1,11 +1,11 @@
 var mysql = require('mysql');
 var logger = require('../log/logger').getLogger('main');
 
-var sqlClient = module.exports;
-
+var CONN_LIMIT = 20;
+var mysqlService = module.exports;
 var connPool = null;
 
-sqlClient.init = (config) => {
+mysqlService.init = (config) => {
   if (connPool != null) {
     return;
   }
@@ -13,20 +13,19 @@ sqlClient.init = (config) => {
   __init(config);
 };
 
-sqlClient.query = (sql, args, cb) => {
-  connPool.getConnection( (err, conn) => {
+mysqlService.query = (sql, args, cb) => {
+  connPool.getConnection((err, conn) => {
     if (!!err) {
-      logger.error("getConnection failed");
+      logger.error("getConnection err = %j", err);
       cb(err);
       return;
     }
 
     conn.query(sql, args, (err, res) => {
       if (!!err && err.fatal) {
-        logger.error("mysql query fatal error");
+        logger.error("mysql query fatal error = %j", err);
         conn.destroy();
       } else {
-        logger.error("mysql query failed");
         conn.release();
       }
 
@@ -35,16 +34,16 @@ sqlClient.query = (sql, args, cb) => {
   });
 };
 
-sqlClient.delete = sqlClient.query;
-sqlClient.update = sqlClient.query;
+mysqlService.delete = mysqlService.query;
+mysqlService.update = mysqlService.query;
 
-sqlClient.shutdown = () => {
+mysqlService.shutdown = () => {
   connPool.destroyAllNow();
 };
 
 function __init(config) {
   connPool = mysql.createPool({
-    connectionLimit: 20,
+    connectionLimit: CONN_LIMIT,
     host: config.host,
     user: config.user,
     password: config.password,

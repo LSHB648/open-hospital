@@ -3,7 +3,6 @@ var path = require('path');
 var logger = require('./log/logger').getLogger('main');
 
 var app = module.exports;
-
 var allowModules = ['admin', 'patient', 'doctor'];
 
 app.loadConfig = (key, cfg) => {
@@ -13,9 +12,11 @@ app.loadConfig = (key, cfg) => {
   if (fs.existsSync(f)) {
     var file = require(f);
     app[key] = file;
+    return true;
 
   } else {
-    logger.error('full configuration file path: %s not found', f);
+    logger.error('loadConfig configuration file path: %s not found', f);
+    return false;
   }
 };
 
