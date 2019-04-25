@@ -42,3 +42,11 @@ dpDocDao.deleteByDoctorId = (id, cb) => {
 
   mysqlService.delete(sql, args, cb);
 };
+
+dpDocDao.getByDepartmentId = (id, cb) => {
+  var sql = 'SELECT * FROM oh_department_doctor WHERE department_id = ?';
+
+  var args = [id];
+
+  mysqlService.query(sql, args, cb);
+};
