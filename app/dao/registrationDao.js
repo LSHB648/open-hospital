@@ -59,9 +59,11 @@ registrationDao.deleteById = (id, cb) => {
 };
 
 registrationDao.updateDoctor = (reg, cb) => {
-  var sql = 'UPDATE oh_registration SET doctor_id = ? WHERE id = ?';
+  var time = Date.now();
 
-  var args = [reg.doctorId, reg.id];
+  var sql = 'UPDATE oh_registration SET doctor_id = ? , update_time = ? WHERE id = ?';
+
+  var args = [reg.doctorId, time, reg.id];
 
   mysqlService.update(sql, args, cb);
 };
@@ -83,9 +85,11 @@ registrationDao.getByDoctorId = (id, cb) => {
 };
 
 registrationDao.updateStatus = (reg, cb) => {
-  var sql = 'UPDATE oh_registration SET status = ? WHERE id = ?';
+  var time = Date.now();
 
-  var args = [reg.status, reg.id];
+  var sql = 'UPDATE oh_registration SET status = ? , update_time = ? WHERE id = ?';
+
+  var args = [reg.status, time, reg.id];
 
   mysqlService.update(sql, args, cb);
 };

@@ -52,9 +52,11 @@ userDao.deleteById = (id, cb) => {
 };
 
 userDao.updateCardNumber = (user, cb) => {
-  var sql = 'UPDATE oh_user SET card_number = ? WHERE id = ?';
+  var time = Date.now();
 
-  var args = [user.id, user.cardNumber];
+  var sql = 'UPDATE oh_user SET card_number = ? , update_time = ? WHERE id = ?';
+
+  var args = [user.id, time, user.cardNumber];
 
   mysqlService.update(sql, args, cb);
 };

@@ -36,9 +36,11 @@ guideDao.getByKey = (key, cb) => {
 };
 
 guideDao.updateValue = (gd, cb) => {
-  var sql = 'UPDATE oh_guide SET value = ? WHERE key = ?';
+  var time = Date.now();
 
-  var args = [gd.value, gd.key];
+  var sql = 'UPDATE oh_guide SET value = ? , update_time = ? WHERE key = ?';
+
+  var args = [gd.value, time, gd.key];
 
   mysqlService.update(sql, args, cb);
 };

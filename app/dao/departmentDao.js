@@ -39,9 +39,11 @@ departmentDao.deleteById = (id, cb) => {
 };
 
 departmentDao.updateInfo = (dp, cb) => {
-  var sql = 'UPDATE oh_department SET name = ? , description = ? WHERE id = ?';
+  var time = Date.now();
 
-  var args = [dp.name, dp.description, dp.id];
+  var sql = 'UPDATE oh_department SET name = ? , description = ? , update_time = ? WHERE id = ?';
+
+  var args = [dp.name, dp.description, time, dp.id];
 
   mysqlService.update(sql, args, cb);
 };
