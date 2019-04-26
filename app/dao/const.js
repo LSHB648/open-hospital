@@ -1,4 +1,9 @@
 module.exports = {
+  'MODULE_TYPE': {
+    'admin': 'admin',
+    'patient': 'patient',
+    'doctor': 'doctor'
+  },
   'USER_TYPE': {
     'admin': 'Admin',
     'doctor': 'Doctor',

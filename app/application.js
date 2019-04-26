@@ -1,9 +1,10 @@
 var fs = require('fs');
 var path = require('path');
+var constx = require('./dao/const');
 var logger = require('./log/logger').getLogger('main');
 
 var app = module.exports;
-var allowModules = ['admin', 'patient', 'doctor'];
+var allowModules = [constx.MODULE_TYPE.admin, constx.MODULE_TYPE.patient, constx.MODULE_TYPE.doctor];
 
 app.loadConfig = (key, cfg) => {
   var env = app['env'];
