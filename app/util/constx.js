@@ -48,5 +48,23 @@ module.exports = {
     'listPrescription': 'ListPrescription',
     'addCharge': 'AddCharge',
     'onlinePay': 'OnlinePay'
+  },
+  'RES_CATEGORY': {
+    'response': 'Response',
+    'push': 'Push'
+  },
+  'ERR_MSG': {
+    '200': 'The api was called successfully.',
+    '401': 'The request format must be json.',
+    '402': 'The action %s is not supported.',
+    '403': 'The parameter %s is required.',
+    '404': 'The value %s of parameter %s is error.',
+    '405': 'The resource %s already exists.',
+    '406': 'The resource id %s is not found.',
+    '407': 'The system internal exception.',
+    '408': 'The operation is not permitted.',
+    '409': 'The user not exists or password wrong.',
+    '410': 'The doctor already belongs to a department.',
+    '411': 'The doctor do not belongs to the department.'
   }
 };
