@@ -63,4 +63,4 @@ if (ret === false) {
 
 redisService.init(app['redis']);
 
-webService.init();
+webService.start();
