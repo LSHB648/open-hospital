@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var constx = require('./dao/const');
+var constx = require('./util/constx');
 var logger = require('./log/logger').getLogger('main');
 
 var app = module.exports;

@@ -1,5 +1,5 @@
 var uuid = require('node-uuid');
-var constx = require('./const');
+var constx = require('../util/constx');
 var mysqlService = require('./mysqlService');
 
 var registrationDao = module.exports;
