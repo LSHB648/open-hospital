@@ -2,6 +2,7 @@ var app = require('./app/application');
 var shutdown = require('./app/log/logger').shutdown;
 var mysqlService = require('./app/dao/mysqlService');
 var redisService = require('./app/dao/redisService');
+var webService = require('./app/service/webService');
 var logger = require('./app/log/logger').getLogger('main');
 
 var HELP_DUMP = '' +
@@ -61,3 +62,5 @@ if (ret === false) {
 }
 
 redisService.init(app['redis']);
+
+webService.init();
