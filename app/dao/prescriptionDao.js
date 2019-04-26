@@ -25,6 +25,14 @@ prescriptionDao.add = (pre, cb) => {
   mysqlService.query(sql, args, cb);
 };
 
+prescriptionDao.getById = (id, cb) => {
+  var sql = 'SELECT * FROM oh_prescription WHERE id = ?';
+
+  var args = [id];
+
+  mysqlService.query(sql, args, cb);
+};
+
 prescriptionDao.getByUserId = (id, cb) => {
   var sql = 'SELECT * FROM oh_prescription WHERE user_id = ?';
 

@@ -9,5 +9,9 @@ module.exports = {
     'waiting': 'Waiting',
     'working': 'Working',
     'done': 'Done'
+  },
+  'CHARGE_STATUS': {
+    'waiting': 'Waiting',
+    'paid': 'Paid'
   }
 };
