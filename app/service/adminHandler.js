@@ -26,70 +26,70 @@ adminHandler.getHandler = () => {
   return handler;
 };
 
-function registerUser(req, cb) {
+function registerUser(req) {
   return;
 }
 
-function deRegisterUser(req, cb) {
+function deRegisterUser(req) {
   return;
 }
 
-function listUser(req, cb) {
+function listUser(req) {
   return;
 }
 
-function logIn(req, cb) {
+function logIn(req) {
   return;
 }
 
-function logOut(req, cb) {
+function logOut(req) {
   return;
 }
 
-function registerDepartment(req, cb) {
+function registerDepartment(req) {
   return;
 }
 
-function deRegisterDepartment(req, cb) {
+function deRegisterDepartment(req) {
   return;
 }
 
-function getDepartment(req, cb) {
+function getDepartment(req) {
   return;
 }
 
-function editDepartment(req, cb) {
+function editDepartment(req) {
   return;
 }
 
-function listDepartment(req, cb) {
+function listDepartment(req) {
   return;
 }
 
-function addDoctor(req, cb) {
+function addDoctor(req) {
   return;
 }
 
-function removeDoctor(req, cb) {
+function removeDoctor(req) {
   return;
 }
 
-function addSchedule(req, cb) {
+function addSchedule(req) {
   return;
 }
 
-function removeSchedule(req, cb) {
+function removeSchedule(req) {
   return;
 }
 
-function listSchedule(req, cb) {
+function listSchedule(req) {
   return;
 }
 
-function editGuide(req, cb) {
+function editGuide(req) {
   return;
 }
 
-function getGuide(req, cb) {
+function getGuide(req) {
   return;
 }

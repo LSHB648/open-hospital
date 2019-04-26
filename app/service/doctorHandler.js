@@ -21,46 +21,46 @@ doctorHandler.getHandler = () => {
   return handler;
 };
 
-function getUser(req, cb) {
+function getUser(req) {
   return;
 }
 
-function logIn(req, cb) {
+function logIn(req) {
   return;
 }
 
-function logOut(req, cb) {
+function logOut(req) {
   return;
 }
 
-function getDepartment(req, cb) {
+function getDepartment(req) {
   return;
 }
 
-function listSchedule(req, cb) {
+function listSchedule(req) {
   return;
 }
 
-function getGuide(req, cb) {
+function getGuide(req) {
   return;
 }
 
-function listRegistration(req, cb) {
+function listRegistration(req) {
   return;
 }
 
-function callRegistration(req, cb) {
+function callRegistration(req) {
   return;
 }
 
-function addPrescription(req, cb) {
+function addPrescription(req) {
   return;
 }
 
-function listPrescription(req, cb) {
+function listPrescription(req) {
   return;
 }
 
-function addCharge(req, cb) {
+function addCharge(req) {
   return;
 }

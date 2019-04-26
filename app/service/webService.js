@@ -63,9 +63,7 @@ webService.start = () => {
         return conn.sendText(response.getStr(req, 402));
       }
 
-      handler[req.userType][req.action](req, (err, res) => {
-        return;
-      });
+      handler[req.userType][req.action](req);
     });
 
     conn.on("close", (code, reason) => {

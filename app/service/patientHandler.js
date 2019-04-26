@@ -24,58 +24,58 @@ patientHandler.getHandler = () => {
   return handler;
 };
 
-function registerUser(req, cb) {
+function registerUser(req) {
   return;
 }
 
-function getUser(req, cb) {
+function getUser(req) {
   return;
 }
 
-function editUser(req, cb) {
+function editUser(req) {
   return;
 }
 
-function logIn(req, cb) {
+function logIn(req) {
   return;
 }
 
-function logOut(req, cb) {
+function logOut(req) {
   return;
 }
 
-function getDepartment(req, cb) {
+function getDepartment(req) {
   return;
 }
 
-function listSchedule(req, cb) {
+function listSchedule(req) {
   return;
 }
 
-function getGuide(req, cb) {
+function getGuide(req) {
   return;
 }
 
-function addRegistration(req, cb) {
+function addRegistration(req) {
   return;
 }
 
-function removeRegistration(req, cb) {
+function removeRegistration(req) {
   return;
 }
 
-function editRegistration(req, cb) {
+function editRegistration(req) {
   return;
 }
 
-function listRegistration(req, cb) {
+function listRegistration(req) {
   return;
 }
 
-function listPrescription(req, cb) {
+function listPrescription(req) {
   return;
 }
 
-function onlinePay(req, cb) {
+function onlinePay(req) {
   return;
 }
