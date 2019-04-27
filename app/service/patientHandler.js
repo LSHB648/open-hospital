@@ -98,7 +98,45 @@ function registerUser(req) {
 }
 
 function getUser(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      req.msg.UserId = ckDec.userId;
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      userDao.getById(req.msg.UserId, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("getUser internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    }
+
+    logger.info("getUser success");
+
+    var user = {};
+    user.Id = res.id;
+    user.Name = res.name;
+    user.Type = res.type;
+    user.RealName = res.real_name;
+    user.Description = res.description;
+    user.CardNumber = res.card_number;
+
+    var ret = response.getJson(req, 200);
+    ret.User = user;
+
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function editUser(req) {
