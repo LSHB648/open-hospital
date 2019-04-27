@@ -66,5 +66,8 @@ module.exports = {
     '409': 'The user not exists or password wrong.',
     '410': 'The doctor already belongs to a department.',
     '411': 'The doctor do not belongs to the department.'
+  },
+  'PREFIX': {
+    'cookieCache': 'Cookie_'
   }
 };
