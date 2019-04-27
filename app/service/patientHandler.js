@@ -141,7 +141,51 @@ patientHandler.getUser = (req) => {
 }
 
 function editUser(req) {
-  return;
+  if (!req.msg.hasOwnProperty('CardNumber')) {
+    logger.error("req para CardNumber not found");
+    req.paraName = 'CardNumber';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!stringx.validateN(req.msg.CardNumber, 11)) {
+    logger.error("req paraVal CardNumber error");
+    req.paraName = 'CardNumber';
+    req.paraVal = req.msg.CardNumber;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      var user = {};
+      user.id = req.msg.UserId;
+      user.cardNumber = req.msg.CardNumber;
+
+      userDao.updateCardNumber(user, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("editUser internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("editUser success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function logIn(req) {
