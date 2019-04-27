@@ -1,11 +1,17 @@
+var async = require('async');
 var constx = require('../util/constx');
+var response = require('../util/response');
+var redisService = require('../dao/redisService');
+var cookieService = require('./cookieService');
+var patientHandler = require('./patientHandler');
+var userDao = require('../dao/userDao');
 var logger = require('../log/logger').getLogger('main');
 
 var doctorHandler = module.exports;
 var handler = {};
 
 doctorHandler.getHandler = () => {
-  handler[constx.ACTION.getUser] = getUser;
+  handler[constx.ACTION.getUser] = patientHandler.getUser;
   handler[constx.ACTION.logIn] = logIn;
   handler[constx.ACTION.logOut] = logOut;
   handler[constx.ACTION.getDepartment] = getDepartment;
@@ -20,10 +26,6 @@ doctorHandler.getHandler = () => {
 
   return handler;
 };
-
-function getUser(req) {
-  return;
-}
 
 function logIn(req) {
   return;

@@ -3,6 +3,7 @@ var constx = require('../util/constx');
 var stringx = require('../util/stringx');
 var response = require('../util/response');
 var redisService = require('../dao/redisService');
+var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
 var logger = require('../log/logger').getLogger('main');
 

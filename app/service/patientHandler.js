@@ -3,6 +3,7 @@ var constx = require('../util/constx');
 var stringx = require('../util/stringx');
 var response = require('../util/response');
 var redisService = require('../dao/redisService');
+var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
 var logger = require('../log/logger').getLogger('main');
 
@@ -11,7 +12,7 @@ var handler = {};
 
 patientHandler.getHandler = () => {
   handler[constx.ACTION.registerUser] = registerUser;
-  handler[constx.ACTION.getUser] = getUser;
+  handler[constx.ACTION.getUser] = patientHandler.getUser;
   handler[constx.ACTION.editUser] = editUser;
   handler[constx.ACTION.logIn] = logIn;
   handler[constx.ACTION.logOut] = logOut;
@@ -97,7 +98,7 @@ function registerUser(req) {
   });
 }
 
-function getUser(req) {
+patientHandler.getUser = (req) => {
   async.waterfall([
     (func) => {
       var ckDec = cookieService.decode(req.msg.Cookie);
