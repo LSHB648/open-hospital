@@ -220,7 +220,55 @@ function listUser(req) {
 }
 
 function logIn(req) {
-  return;
+  if (!req.msg.hasOwnProperty('Name')) {
+    logger.error("req para Name not found");
+    req.paraName = 'Name';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('PassWord')) {
+    logger.error("req para PassWord not found");
+    req.paraName = 'PassWord';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('Type')) {
+    logger.error("req para Type not found");
+    req.paraName = 'Type';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var user = {};
+      user.name = req.msg.Name;
+      user.password = req.msg.PassWord;
+      user.type = req.msg.Type;
+
+      userDao.getLogIn(req.msg.Name, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req logIn not found");
+        return req.conn.sendText(response.getStr(req, 409));
+      }
+
+      var key = constx.PREFIX.cookieCache + res.id;
+      var cookie = cookieService.create(req.msg.Type, res.id, func);
+      req.msg.Cookie = cookie;
+      redisService.setKeyExpire(key, cookie, constx.TIMEOUT.cookie, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("logIn internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("logIn success");
+
+    var ret = response.getJson(req, 200);
+    ret.Cookie = req.msg.Cookie;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function logOut(req) {

@@ -69,5 +69,8 @@ module.exports = {
   },
   'PREFIX': {
     'cookieCache': 'Cookie_'
+  },
+  'TIMEOUT': {
+    'cookie': 300000
   }
 };
