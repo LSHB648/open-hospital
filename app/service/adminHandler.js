@@ -126,7 +126,50 @@ function registerUser(req) {
 }
 
 function deRegisterUser(req) {
-  return;
+  if (!req.msg.hasOwnProperty('UserId')) {
+    logger.error("req para UserId not found");
+    req.paraName = 'UserId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      userDao.getById(req.msg.UserId, func);
+
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req UserId not exists");
+        req.rid = req.msg.UserId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      var key = constx.PREFIX.cookieCache + req.msg.UserId;
+      redisService.delKey(key, func);
+
+    }, (func) => {
+      userDao.deleteById(req.msg.UserId, func);
+
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("deRegisterUser internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("deRegisterUser success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function listUser(req) {

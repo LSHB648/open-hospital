@@ -71,3 +71,13 @@ redisService.getKey = (key, cb) => {
     cb(err, res);
   });
 };
+
+redisService.delKey = (key, cb) => {
+  redisClient.del(key, (err) => {
+    if (!!err) {
+      logger.error("redis delKey err = %j", err);
+    }
+
+    cb(err);
+  });
+};
