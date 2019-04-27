@@ -174,7 +174,49 @@ function deRegisterUser(req) {
 }
 
 function listUser(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      userDao.getAll(func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("listUser internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("listUser success");
+
+    var users = [];
+
+    for (var u of res) {
+      var user = {};
+
+      user.Id = u.id;
+      user.Name = u.name;
+      user.Type = u.type;
+      user.RealName = u.real_name;
+      user.Description = u.description;
+      user.CardNumber = u.card_number;
+
+      users.push(user);
+    }
+
+    var ret = response.getJson(req, 200);
+    ret.Users = users;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function logIn(req) {
