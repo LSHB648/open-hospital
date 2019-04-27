@@ -5,6 +5,7 @@ var response = require('../util/response');
 var redisService = require('../dao/redisService');
 var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
+var adminHandler = require('./adminHandler');
 var logger = require('../log/logger').getLogger('main');
 
 var patientHandler = module.exports;
@@ -14,7 +15,7 @@ patientHandler.getHandler = () => {
   handler[constx.ACTION.registerUser] = registerUser;
   handler[constx.ACTION.getUser] = patientHandler.getUser;
   handler[constx.ACTION.editUser] = editUser;
-  handler[constx.ACTION.logIn] = logIn;
+  handler[constx.ACTION.logIn] = adminHandler.logIn;
   handler[constx.ACTION.logOut] = logOut;
   handler[constx.ACTION.getDepartment] = getDepartment;
   handler[constx.ACTION.listDepartment] = listDepartment;
@@ -186,10 +187,6 @@ function editUser(req) {
       return req.conn.sendText(response.getStr(req, 200));
     }
   });
-}
-
-function logIn(req) {
-  return;
 }
 
 function logOut(req) {

@@ -14,7 +14,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.registerUser] = registerUser;
   handler[constx.ACTION.deRegisterUser] = deRegisterUser;
   handler[constx.ACTION.listUser] = listUser;
-  handler[constx.ACTION.logIn] = logIn;
+  handler[constx.ACTION.logIn] = adminHandler.logIn;
   handler[constx.ACTION.logOut] = logOut;
   handler[constx.ACTION.registerDepartment] = registerDepartment;
   handler[constx.ACTION.deRegisterDepartment] = deRegisterDepartment;
@@ -219,7 +219,7 @@ function listUser(req) {
   });
 }
 
-function logIn(req) {
+adminHandler.logIn = (req) => {
   if (!req.msg.hasOwnProperty('Name')) {
     logger.error("req para Name not found");
     req.paraName = 'Name';
