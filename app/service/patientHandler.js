@@ -1,4 +1,9 @@
+var async = require('async');
 var constx = require('../util/constx');
+var stringx = require('../util/stringx');
+var response = require('../util/response');
+var redisService = require('../dao/redisService');
+var userDao = require('../dao/userDao');
 var logger = require('../log/logger').getLogger('main');
 
 var patientHandler = module.exports;
@@ -25,7 +30,71 @@ patientHandler.getHandler = () => {
 };
 
 function registerUser(req) {
-  return;
+  if (!req.msg.hasOwnProperty('Name')) {
+    logger.error("req para Name not found");
+    req.paraName = 'Name';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!stringx.validate64(req.msg.Name)) {
+    logger.error("req paraVal Name error");
+    req.paraName = 'Name';
+    req.paraVal = req.msg.Name;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  if (!req.msg.hasOwnProperty('PassWord')) {
+    logger.error("req para PassWord not found");
+    req.paraName = 'PassWord';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  // 客户端传输过来的密码要经过base64编码，不能明文传输
+  var pwAscii = Buffer.from(req.msg.PassWord, 'base64').toString('ascii');
+  if (!stringx.validate64(pwAscii)) {
+    logger.error("req paraVal PassWord error");
+    req.paraName = 'PassWord';
+    req.paraVal = req.msg.PassWord;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  if (!req.msg.hasOwnProperty('RealName')) {
+    logger.error("req para RealName not found");
+    req.paraName = 'RealName';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      userDao.getByName(req.msg.Name, func);
+
+    }, (res, func) => {
+      if (!!res) {
+        logger.error("req Name already exists");
+        req.resource = req.msg.Name;
+        return req.conn.sendText(response.getStr(req, 405));
+      }
+
+      var user = {};
+      user.name = req.msg.Name;
+      user.password = req.msg.PassWord;
+      user.type = req.msg.Type;
+      user.realName = req.msg.RealName;
+      user.description = "";
+      user.cardNumber = "";
+
+      userDao.add(user, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("registerUser internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("registerUser success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function getUser(req) {

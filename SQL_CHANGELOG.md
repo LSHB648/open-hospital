@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `oh_user`;
 CREATE TABLE `oh_user` (
     `id` VARCHAR(64) NOT NULL,
     `name` VARCHAR(255) NOT NULL COMMENT '用户登录名',
-    `password` VARCHAR(255) NOT NULL COMMENT '用户登录密码，明文存储',
+    `password` VARCHAR(255) NOT NULL COMMENT '用户登录密码，base64编码存储',
     `type` VARCHAR(64) NOT NULL COMMENT '用户类型，Admin-系统管理员，Doctor-医生用户，Registrar-挂号员，Patient-门诊用户',
     `real_name` VARCHAR(255) NOT NULL COMMENT '用户真实名称',
     `description` VARCHAR(255) NOT NULL COMMENT '用户简介，对医生用户有意义',
