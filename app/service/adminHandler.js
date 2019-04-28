@@ -28,7 +28,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.removeDoctor] = removeDoctor;
   handler[constx.ACTION.addSchedule] = addSchedule;
   handler[constx.ACTION.removeSchedule] = removeSchedule;
-  handler[constx.ACTION.listSchedule] = listSchedule;
+  handler[constx.ACTION.listSchedule] = adminHandler.listSchedule;
   handler[constx.ACTION.editGuide] = editGuide;
   handler[constx.ACTION.getGuide] = getGuide;
 
@@ -813,7 +813,7 @@ function removeSchedule(req) {
   });
 }
 
-function listSchedule(req) {
+adminHandler.listSchedule = (req) => {
   var dps = [];
 
   async.waterfall([
