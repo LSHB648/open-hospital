@@ -308,7 +308,76 @@ function removeRegistration(req) {
 }
 
 function editRegistration(req) {
-  return;
+  if (!req.msg.hasOwnProperty('RegistrationId')) {
+    logger.error("req para RegistrationId not found");
+    req.paraName = 'RegistrationId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('DoctorId')) {
+    logger.error("req para DoctorId not found");
+    req.paraName = 'DoctorId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      var reg = {};
+      reg.id = req.msg.RegistrationId;
+      reg.userId = req.msg.UserId;
+
+      registrationDao.getByRegIdUid(reg, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req registration not exists");
+        req.rid = req.msg.RegistrationId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      if (res.status !== constx.REG_STATUS.waiting) {
+        logger.error("req registration status not allowed to edit");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      req.msg.DepartmentId = res.department_id;
+      scheduleDao.getByDDId(res.department_id, req.msg.DoctorId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req doctor not on schedule");
+        req.rid = req.msg.DoctorId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      var reg = {};
+      reg.id = req.msg.RegistrationId;
+      reg.doctorId = req.msg.DoctorId;
+
+      registrationDao.updateDoctor(reg, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("editRegistration internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("editRegistration success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function listRegistration(req) {
