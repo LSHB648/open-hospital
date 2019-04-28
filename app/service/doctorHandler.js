@@ -177,7 +177,7 @@ function addPrescription(req) {
       var ckDec = cookieService.decode(req.msg.Cookie);
       var key = constx.PREFIX.cookieCache + ckDec.userId;
 
-      req.msg.doctorId = ckDec.userId;
+      req.msg.DoctorId = ckDec.userId;
       redisService.getKey(key, func);
 
     }, (cookie, func) => {
@@ -186,7 +186,7 @@ function addPrescription(req) {
         return req.conn.sendText(response.getStr(req, 408));
       }
 
-      dpDocDao.getByDoctorId(req.msg.doctorId, func);
+      dpDocDao.getByDoctorId(req.msg.DoctorId, func);
     }, (res, func) => {
       if (!res) {
         logger.error("req doctor not found");
@@ -196,7 +196,7 @@ function addPrescription(req) {
       var pre = {};
       pre.userId = req.msg.UserId;
       pre.departmentId = res.department_id;
-      pre.doctorId = req.msg.doctorId;
+      pre.doctorId = req.msg.DoctorId;
       pre.content = req.msg.Content;
 
       prescriptionDao.add(req.msg.UserId, func);
