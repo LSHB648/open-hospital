@@ -259,7 +259,52 @@ function addRegistration(req) {
 }
 
 function removeRegistration(req) {
-  return;
+  if (!req.msg.hasOwnProperty('RegistrationId')) {
+    logger.error("req para RegistrationId not found");
+    req.paraName = 'RegistrationId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      var reg = {};
+      reg.id = req.msg.RegistrationId;
+      reg.userId = req.msg.UserId;
+
+      registrationDao.getByRegIdUid(reg, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req registration not exists");
+        req.rid = req.msg.RegistrationId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      registrationDao.deleteById(req.msg.RegistrationId, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("removeRegistration internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("removeRegistration success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function editRegistration(req) {
