@@ -767,7 +767,50 @@ function addSchedule(req) {
 }
 
 function removeSchedule(req) {
-  return;
+  if (!req.msg.hasOwnProperty('UserId')) {
+    logger.error("req para UserId not found");
+    req.paraName = 'UserId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('DepartmentId')) {
+    logger.error("req para DepartmentId not found");
+    req.paraName = 'DepartmentId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      scheduleDao.getByDDId(req.msg.DepartmentId, req.msg.UserId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req resource not found");
+        req.resource = req.msg.UserId;
+        return req.conn.sendText(response.getStr(req, 405));
+      }
+
+      scheduleDao.deleteByDoctorId(req.msg.UserId, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("removeSchedule internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("removeSchedule success");
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
 
 function listSchedule(req) {
