@@ -456,7 +456,75 @@ adminHandler.getDepartment = (req) => {
 }
 
 function editDepartment(req) {
-  return;
+  if (!req.msg.hasOwnProperty('DepartmentId')) {
+    logger.error("req para DepartmentId not found");
+    req.paraName = 'DepartmentId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('Name')) {
+    logger.error("req para Name not found");
+    req.paraName = 'Name';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (req.msg.Name.length < 1 || req.msg.Name.length > 63) {
+    logger.error("req paraVal Name error");
+    req.paraName = 'Name';
+    req.paraVal = req.msg.Name;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  if (!req.msg.hasOwnProperty('Description')) {
+    logger.error("req para Description not found");
+    req.paraName = 'Description';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (req.msg.Description.length < 1 || req.msg.Description.length > 254) {
+    logger.error("req paraVal Description error");
+    req.paraName = 'Description';
+    req.paraVal = req.msg.Description;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getById(req.msg.DepartmentId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req resource DepartmentId not found");
+        req.rid = req.msg.DepartmentId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      var dp = {};
+      dp.id = req.msg.DepartmentId;
+      dp.name = req.msg.Name;
+      dp.description = req.msg.Description;
+
+      departmentDao.updateInfo(dp, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("editDepartment internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("editDepartment success");
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
 
 function listDepartment(req) {
