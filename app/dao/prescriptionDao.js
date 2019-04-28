@@ -34,7 +34,7 @@ prescriptionDao.getById = (id, cb) => {
 };
 
 prescriptionDao.getByUserId = (id, cb) => {
-  var sql = 'SELECT * FROM oh_prescription WHERE user_id = ?';
+  var sql = 'SELECT * FROM oh_prescription WHERE user_id = ? ORDER BY create_time DESC';
 
   var args = [id];
 
@@ -42,7 +42,7 @@ prescriptionDao.getByUserId = (id, cb) => {
 };
 
 prescriptionDao.getByDoctorId = (id, cb) => {
-  var sql = 'SELECT * FROM oh_prescription WHERE doctor_id = ?';
+  var sql = 'SELECT * FROM oh_prescription WHERE doctor_id = ? ORDER BY create_time DESC';
 
   var args = [id];
 

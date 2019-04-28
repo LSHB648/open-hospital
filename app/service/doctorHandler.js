@@ -212,7 +212,50 @@ function addPrescription(req) {
 }
 
 function listPrescription(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      prescriptionDao.getByDoctorId(req.msg.UserId, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("listPrescription internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("listPrescription success");
+
+    var pres = [];
+
+    for (var p of res) {
+      var pre = {};
+
+      pre.Id = p.id;
+      pre.UserId = p.user_id;
+      pre.DepartmentId = p.department_id;
+      pre.DoctorId = p.doctor_id;
+      pre.Content = p.content;
+
+      pres.push(pre);
+    }
+
+    var ret = response.getJson(req, 200);
+    ret.Prescriptions = pres;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function addCharge(req) {
