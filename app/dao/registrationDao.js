@@ -69,7 +69,7 @@ registrationDao.updateDoctor = (reg, cb) => {
 };
 
 registrationDao.getByUserId = (id, cb) => {
-  var sql = 'SELECT * FROM oh_registration WHERE user_id = ?';
+  var sql = 'SELECT * FROM oh_registration WHERE user_id = ? ORDER BY create_time DESC';
 
   var args = [id];
 
@@ -77,7 +77,7 @@ registrationDao.getByUserId = (id, cb) => {
 };
 
 registrationDao.getByDoctorId = (id, cb) => {
-  var sql = 'SELECT * FROM oh_registration WHERE doctor_id = ?';
+  var sql = 'SELECT * FROM oh_registration WHERE doctor_id = ? ORDER BY create_time DESC';
 
   var args = [id];
 
