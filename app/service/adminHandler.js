@@ -272,7 +272,33 @@ adminHandler.logIn = (req) => {
 }
 
 function logOut(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      var key = constx.PREFIX.cookieCache + req.msg.UserId;
+      redisService.delKey(key, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("logOut internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("logOut success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function registerDepartment(req) {
