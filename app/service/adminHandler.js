@@ -814,7 +814,47 @@ function removeSchedule(req) {
 }
 
 function listSchedule(req) {
-  return;
+  var dps = [];
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getAll(func);
+    }, (res, func) => {
+      async.each(res, (dp, next) => {
+        _getScheduleDetail(dp.id, (err, detail) => {
+          if (!!err) {
+            logger.error("_getScheduleDetail error = %j", err);
+            return next(err);
+          }
+
+          dps.push(detail);
+          return next(null);
+        });
+      }, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("listSchedule internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("listSchedule success");
+
+    var ret = response.getJson(req, 200);
+    ret.Departments = dps;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function editGuide(req) {
@@ -873,6 +913,58 @@ function _getDepartmentDetail(id, cb) {
     }
 
     logger.info("_getDepartmentDetail success");
+    return cb(err, dp);
+  });
+}
+
+function _getScheduleDetail(id, cb) {
+  var dp = {};
+
+  async.waterfall([
+    (func) => {
+      departmentDao.getById(id, func);
+
+    }, (res, func) => {
+      dp.Id = res.id;
+      dp.Name = res.name;
+      dp.Description = res.description;
+      dp.Doctors = [];
+
+      scheduleDao.getByDepartmentId(id, func);
+
+    }, (res, func) => {
+      async.each(res, (dd, next) => {
+        userDao.getById(dd.doctor_id, (err, user) => {
+          if (!!err) {
+            logger.error("userDao.getById error = %j", err);
+            return next(err);
+          }
+
+          if (!user) {
+            logger.error("userDao.getById not found");
+            return next("doctor_id not found");
+          }
+
+          var elem = {};
+          elem.Id = user.id;
+          elem.Name = user.name;
+          elem.Type = user.type;
+          elem.RealName = user.real_name;
+          elem.Description = user.description;
+          elem.CardNumber = user.card_number;
+
+          dp.Doctors.push(elem);
+          return next(null);
+        });
+      }, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("_getScheduleDetail internal error = %s", err);
+      return cb(err, null);
+    }
+
+    logger.info("_getScheduleDetail success");
     return cb(err, dp);
   });
 }
