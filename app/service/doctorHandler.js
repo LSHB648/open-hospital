@@ -15,7 +15,7 @@ doctorHandler.getHandler = () => {
   handler[constx.ACTION.getUser] = patientHandler.getUser;
   handler[constx.ACTION.logIn] = adminHandler.logIn;
   handler[constx.ACTION.logOut] = adminHandler.logOut;
-  handler[constx.ACTION.getDepartment] = getDepartment;
+  handler[constx.ACTION.getDepartment] = adminHandler.getDepartment;
   handler[constx.ACTION.listDepartment] = listDepartment;
   handler[constx.ACTION.listSchedule] = listSchedule;
   handler[constx.ACTION.getGuide] = getGuide;
@@ -28,7 +28,7 @@ doctorHandler.getHandler = () => {
   return handler;
 };
 
-function getDepartment(req) {
+function listDepartment(req) {
   return;
 }
 
