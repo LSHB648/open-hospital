@@ -643,6 +643,12 @@ function addDoctor(req) {
       dd.doctorId = req.msg.UserId;
 
       dpDocDao.add(dd, func);
+    }, (res, func) => {
+      var user = {};
+      user.id = req.msg.UserId;
+      user.description = req.msg.Description;
+
+      userDao.updateDescription(user, func);
     }
   ], (err) => {
     if (!!err) {

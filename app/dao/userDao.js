@@ -56,7 +56,17 @@ userDao.updateCardNumber = (user, cb) => {
 
   var sql = 'UPDATE oh_user SET card_number = ? , update_time = ? WHERE id = ?';
 
-  var args = [user.id, time, user.cardNumber];
+  var args = [user.cardNumber, time, user.id];
+
+  mysqlService.update(sql, args, cb);
+};
+
+userDao.updateDescription = (user, cb) => {
+  var time = Date.now();
+
+  var sql = 'UPDATE oh_user SET description = ? , update_time = ? WHERE id = ?';
+
+  var args = [user.description, time, user.id];
 
   mysqlService.update(sql, args, cb);
 };
