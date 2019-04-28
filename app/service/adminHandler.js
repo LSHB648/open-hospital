@@ -369,7 +369,45 @@ function registerDepartment(req) {
 }
 
 function deRegisterDepartment(req) {
-  return;
+  if (!req.msg.hasOwnProperty('DepartmentId')) {
+    logger.error("req para DepartmentId not found");
+    req.paraName = 'DepartmentId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getById(req.msg.DepartmentId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req resource DepartmentId not found");
+        req.rid = req.msg.DepartmentId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      departmentDao.deleteById(req.msg.DepartmentId, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("deRegisterDepartment internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("deRegisterDepartment success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function getDepartment(req) {
