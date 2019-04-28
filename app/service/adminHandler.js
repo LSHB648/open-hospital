@@ -909,7 +909,37 @@ function editGuide(req) {
 }
 
 function getGuide(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      guideDao.getAll(func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("getGuide internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("getGuide success");
+    var guide = {};
+    for (var gd of res) {
+      guide[gd.key] = gd.value;
+    }
+
+    var ret = response.getJson(req, 200);
+    ret.Guide = guide;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function _getDepartmentDetail(id, cb) {

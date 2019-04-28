@@ -27,10 +27,10 @@ guideDao.getByKey = (key, cb) => {
   mysqlService.query(sql, args, cb);
 };
 
-guideDao.getByKey = (key, cb) => {
-  var sql = 'SELECT * FROM oh_guide WHERE key = ?';
+guideDao.getAll = (cb) => {
+  var sql = 'SELECT * FROM oh_guide';
 
-  var args = [key];
+  var args = [];
 
   mysqlService.query(sql, args, cb);
 };
