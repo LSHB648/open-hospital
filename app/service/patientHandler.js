@@ -189,6 +189,10 @@ function editUser(req) {
   });
 }
 
+function listDepartment(req) {
+  return;
+}
+
 function listSchedule(req) {
   return;
 }

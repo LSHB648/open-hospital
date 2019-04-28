@@ -528,7 +528,47 @@ function editDepartment(req) {
 }
 
 function listDepartment(req) {
-  return;
+  var dps = [];
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getAll(func);
+    }, (res, func) => {
+      async.each(res, (dp, next) => {
+        _getDepartmentDetail(dp.id, (err, detail) => {
+          if (!!err) {
+            logger.error("_getDepartmentDetail error = %j", err);
+            return next(err);
+          }
+
+          dps.push(detail);
+          return next(null);
+        });
+      }, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("listDepartment internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("listDepartment success");
+
+    var ret = response.getJson(req, 200);
+    ret.Departments = dps;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function addDoctor(req) {
