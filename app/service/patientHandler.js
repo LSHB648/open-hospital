@@ -20,7 +20,7 @@ patientHandler.getHandler = () => {
   handler[constx.ACTION.getDepartment] = adminHandler.getDepartment;
   handler[constx.ACTION.listDepartment] = adminHandler.listDepartment;
   handler[constx.ACTION.listSchedule] = adminHandler.listSchedule;
-  handler[constx.ACTION.getGuide] = getGuide;
+  handler[constx.ACTION.getGuide] = adminHandler.getGuide;
   handler[constx.ACTION.addRegistration] = addRegistration;
   handler[constx.ACTION.removeRegistration] = removeRegistration;
   handler[constx.ACTION.editRegistration] = editRegistration;
@@ -139,7 +139,7 @@ patientHandler.getUser = (req) => {
 
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 function editUser(req) {
   if (!req.msg.hasOwnProperty('CardNumber')) {
@@ -187,10 +187,6 @@ function editUser(req) {
       return req.conn.sendText(response.getStr(req, 200));
     }
   });
-}
-
-function getGuide(req) {
-  return;
 }
 
 function addRegistration(req) {

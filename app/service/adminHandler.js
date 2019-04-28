@@ -31,7 +31,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.removeSchedule] = removeSchedule;
   handler[constx.ACTION.listSchedule] = adminHandler.listSchedule;
   handler[constx.ACTION.editGuide] = editGuide;
-  handler[constx.ACTION.getGuide] = getGuide;
+  handler[constx.ACTION.getGuide] = adminHandler.getGuide;
 
   return handler;
 };
@@ -273,7 +273,7 @@ adminHandler.logIn = (req) => {
     ret.Cookie = req.msg.Cookie;
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 adminHandler.logOut = (req) => {
   async.waterfall([
@@ -303,7 +303,7 @@ adminHandler.logOut = (req) => {
       return req.conn.sendText(response.getStr(req, 200));
     }
   });
-}
+};
 
 function registerDepartment(req) {
   if (!req.msg.hasOwnProperty('Name')) {
@@ -455,7 +455,7 @@ adminHandler.getDepartment = (req) => {
     ret.Department = res;
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 function editDepartment(req) {
   if (!req.msg.hasOwnProperty('DepartmentId')) {
@@ -571,7 +571,7 @@ adminHandler.listDepartment = (req) => {
     ret.Departments = dps;
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 function addDoctor(req) {
   if (!req.msg.hasOwnProperty('UserId')) {
@@ -856,7 +856,7 @@ adminHandler.listSchedule = (req) => {
     ret.Departments = dps;
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 function editGuide(req) {
   if (!req.msg.hasOwnProperty('Guide')) {
@@ -908,7 +908,7 @@ function editGuide(req) {
   });
 }
 
-function getGuide(req) {
+adminHandler.getGuide = (req) => {
   async.waterfall([
     (func) => {
       var ckDec = cookieService.decode(req.msg.Cookie);
@@ -940,7 +940,7 @@ function getGuide(req) {
     ret.Guide = guide;
     return req.conn.sendText(JSON.stringify(ret));
   });
-}
+};
 
 function _getDepartmentDetail(id, cb) {
   var dp = {};
