@@ -7,6 +7,7 @@ var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
 var departmentDao = require('../dao/departmentDao');
 var dpDocDao = require('../dao/dpDocDao');
+var scheduleDao = require('../dao/scheduleDao');
 var logger = require('../log/logger').getLogger('main');
 
 var adminHandler = module.exports;
@@ -708,7 +709,61 @@ function removeDoctor(req) {
 }
 
 function addSchedule(req) {
-  return;
+  if (!req.msg.hasOwnProperty('UserId')) {
+    logger.error("req para UserId not found");
+    req.paraName = 'UserId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('DepartmentId')) {
+    logger.error("req para DepartmentId not found");
+    req.paraName = 'DepartmentId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      dpDocDao.getByDDId(req.msg.DepartmentId, req.msg.UserId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req resource UserId not found");
+        return req.conn.sendText(response.getStr(req, 411));
+      }
+
+      scheduleDao.getByDDId(req.msg.DepartmentId, req.msg.UserId, func);
+    }, (res, func) => {
+      if (!!res) {
+        logger.error("req resource duplicate");
+        req.resource = req.msg.UserId;
+        return req.conn.sendText(response.getStr(req, 405));
+      }
+
+      var sch = {};
+      sch.departmentId = req.msg.DepartmentId;
+      sch.doctorId = req.msg.UserId;
+
+      scheduleDao.add(sch, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("addSchedule internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("addSchedule success");
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
 
 function removeSchedule(req) {
