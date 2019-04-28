@@ -8,6 +8,7 @@ var userDao = require('../dao/userDao');
 var scheduleDao = require('../dao/scheduleDao');
 var registrationDao = require('../dao/registrationDao');
 var prescriptionDao = require('../dao/prescriptionDao');
+var chargeDao = require('../dao/chargeDao');
 var adminHandler = require('./adminHandler');
 var logger = require('../log/logger').getLogger('main');
 
@@ -476,5 +477,66 @@ function listPrescription(req) {
 }
 
 function onlinePay(req) {
-  return;
+  if (!req.msg.hasOwnProperty('ChargeId')) {
+    logger.error("req para ChargeId not found");
+    req.paraName = 'ChargeId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      chargeDao.getById(req.msg.ChargeId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req ChargeId not found");
+        req.rid = req.msg.ChargeId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      if (res.status !== constx.CHARGE_STATUS.waiting) {
+        logger.error("req charge status is paid");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      prescriptionDao.getById(res.prescription_id, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req prescription_id not found");
+        return req.conn.sendText(response.getStr(req, 407));
+      }
+
+      if (req.msg.UserId !== res.user_id) {
+        logger.error("req prescription not belong to this user");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      // 模拟的支付操作，提取医疗卡号，扣钱
+
+      var cha = {};
+      cha.id = req.msg.ChargeId;
+      cha.status = constx.CHARGE_STATUS.paid;
+
+      chargeDao.updateStatus(cha, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("onlinePay internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("onlinePay success");;
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
