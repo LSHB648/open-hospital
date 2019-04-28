@@ -26,6 +26,14 @@ chargeDao.add = (cha, cb) => {
   mysqlService.query(sql, args, cb);
 };
 
+chargeDao.getByPrescriptionId = (id, cb) => {
+  var sql = 'SELECT * FROM oh_charge WHERE prescription_id = ?';
+
+  var args = [id];
+
+  mysqlService.query(sql, args, cb);
+};
+
 chargeDao.updateStatus = (cha, cb) => {
   var time = Date.now();
 
