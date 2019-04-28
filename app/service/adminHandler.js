@@ -20,7 +20,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.logOut] = adminHandler.logOut;
   handler[constx.ACTION.registerDepartment] = registerDepartment;
   handler[constx.ACTION.deRegisterDepartment] = deRegisterDepartment;
-  handler[constx.ACTION.getDepartment] = getDepartment;
+  handler[constx.ACTION.getDepartment] = adminHandler.getDepartment;
   handler[constx.ACTION.editDepartment] = editDepartment;
   handler[constx.ACTION.listDepartment] = listDepartment;
   handler[constx.ACTION.addDoctor] = addDoctor;
@@ -411,7 +411,7 @@ function deRegisterDepartment(req) {
   });
 }
 
-function getDepartment(req) {
+adminHandler.getDepartment = (req) => {
   if (!req.msg.hasOwnProperty('DepartmentId')) {
     logger.error("req para DepartmentId not found");
     req.paraName = 'DepartmentId';
