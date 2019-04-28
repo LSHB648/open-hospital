@@ -30,6 +30,14 @@ departmentDao.getById = (id, cb) => {
   mysqlService.query(sql, args, cb);
 };
 
+departmentDao.getByName = (name, cb) => {
+  var sql = 'SELECT * FROM oh_department WHERE name = ?';
+
+  var args = [name];
+
+  mysqlService.query(sql, args, cb);
+};
+
 departmentDao.deleteById = (id, cb) => {
   var sql = 'DELETE FROM oh_department WHERE id = ?';
 

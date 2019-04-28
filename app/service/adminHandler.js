@@ -5,6 +5,7 @@ var response = require('../util/response');
 var redisService = require('../dao/redisService');
 var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
+var departmentDao = require('../dao/departmentDao');
 var logger = require('../log/logger').getLogger('main');
 
 var adminHandler = module.exports;
@@ -302,7 +303,69 @@ adminHandler.logOut = (req) => {
 }
 
 function registerDepartment(req) {
-  return;
+  if (!req.msg.hasOwnProperty('Name')) {
+    logger.error("req para Name not found");
+    req.paraName = 'Name';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (req.msg.Name.length < 1 || req.msg.Name.length > 63) {
+    logger.error("req paraVal Name error");
+    req.paraName = 'Name';
+    req.paraVal = req.msg.Name;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  if (!req.msg.hasOwnProperty('Description')) {
+    logger.error("req para Description not found");
+    req.paraName = 'Description';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (req.msg.Description.length < 1 || req.msg.Description.length > 254) {
+    logger.error("req paraVal Description error");
+    req.paraName = 'Description';
+    req.paraVal = req.msg.Description;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getByName(req.msg.Name, func);
+    }, (res, func) => {
+      if (!!res) {
+        logger.error("req para Name already exists");
+        req.resource = req.msg.Name;
+        return req.conn.sendText(response.getStr(req, 405));
+      }
+
+      var dp = {};
+      dp.name = req.msg.Name;
+      dp.description = req.msg.Description;
+
+      departmentDao.add(dp, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("registerDepartment internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+
+    } else {
+      logger.info("registerDepartment success");
+      return req.conn.sendText(response.getStr(req, 200));
+    }
+  });
 }
 
 function deRegisterDepartment(req) {
