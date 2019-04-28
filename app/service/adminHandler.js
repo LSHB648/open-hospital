@@ -24,7 +24,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.deRegisterDepartment] = deRegisterDepartment;
   handler[constx.ACTION.getDepartment] = adminHandler.getDepartment;
   handler[constx.ACTION.editDepartment] = editDepartment;
-  handler[constx.ACTION.listDepartment] = listDepartment;
+  handler[constx.ACTION.listDepartment] = adminHandler.listDepartment;
   handler[constx.ACTION.addDoctor] = addDoctor;
   handler[constx.ACTION.removeDoctor] = removeDoctor;
   handler[constx.ACTION.addSchedule] = addSchedule;
