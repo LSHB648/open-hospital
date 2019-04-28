@@ -527,7 +527,7 @@ function editDepartment(req) {
   });
 }
 
-function listDepartment(req) {
+adminHandler.listDepartment = (req) => {
   var dps = [];
 
   async.waterfall([
