@@ -5,6 +5,7 @@ var redisService = require('../dao/redisService');
 var cookieService = require('./cookieService');
 var patientHandler = require('./patientHandler');
 var userDao = require('../dao/userDao');
+var registrationDao = require('../dao/registrationDao');
 var adminHandler = require('./adminHandler');
 var logger = require('../log/logger').getLogger('main');
 
@@ -29,7 +30,50 @@ doctorHandler.getHandler = () => {
 };
 
 function listRegistration(req) {
-  return;
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.UserId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        req.paraName = 'Cookie';
+        req.paraVal = req.msg.Cookie;
+        return req.conn.sendText(response.getStr(req, 404));
+      }
+
+      registrationDao.getByDoctorId(req.msg.UserId, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("listRegistration internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("listRegistration success");
+
+    var regs = [];
+
+    for (var r of res) {
+      var reg = {};
+
+      reg.Id = r.id;
+      reg.UserId = r.user_id;
+      reg.DepartmentId = r.department_id;
+      reg.DoctorId = r.doctor_id;
+      reg.Status = r.status;
+
+      regs.push(reg);
+    }
+
+    var ret = response.getJson(req, 200);
+    ret.Registrations = regs;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function callRegistration(req) {
