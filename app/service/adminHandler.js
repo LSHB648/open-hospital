@@ -8,6 +8,7 @@ var userDao = require('../dao/userDao');
 var departmentDao = require('../dao/departmentDao');
 var dpDocDao = require('../dao/dpDocDao');
 var scheduleDao = require('../dao/scheduleDao');
+var guideDao = require('../dao/guideDao');
 var logger = require('../log/logger').getLogger('main');
 
 var adminHandler = module.exports;
@@ -858,7 +859,53 @@ adminHandler.listSchedule = (req) => {
 }
 
 function editGuide(req) {
-  return;
+  if (!req.msg.hasOwnProperty('Guide')) {
+    logger.error("req para Guide not found");
+    req.paraName = 'Guide';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  for (var attr of constx.GUIDE_ATTR) {
+    if (!req.msg.Guide.hasOwnProperty(attr)) {
+      logger.error("req para Guide." + attr + " not found");
+      req.paraName = 'Guide.' + attr;
+      return req.conn.sendText(response.getStr(req, 403));
+    }
+
+    if (req.msg.Guide[attr].length < 1 || req.msg.Guide[attr].length > 254) {
+      logger.error("req paraVal Guide." + attr + " error");
+      req.paraName = 'Guide.' + attr;
+      req.paraVal = req.msg.Guide[attr];
+      return req.conn.sendText(response.getStr(req, 404));
+    }
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      async.each(constx.GUIDE_ATTR, (attr, next) => {
+        _editGuide(attr, req.msg.Guide[attr], next);
+      }, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("editGuide internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("editGuide success");
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
 
 function getGuide(req) {
@@ -966,5 +1013,38 @@ function _getScheduleDetail(id, cb) {
 
     logger.info("_getScheduleDetail success");
     return cb(err, dp);
+  });
+}
+
+function _editGuide(attr, value, cb) {
+  async.waterfall([
+    (func) => {
+      guideDao.getByKey(attr, func);
+
+    }, (res, func) => {
+      if (!!res) {
+        logger.info("_editGuide update");
+
+        var gd = {};
+        gd.key = attr;
+        gd.value = value;
+        return guideDao.updateValue(gd, func);
+      }
+
+      logger.info("_editGuide add");
+
+      var gd = {};
+      gd.key = attr;
+      gd.value = value;
+      guideDao.add(gd, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("_editGuide internal error = %s", err);
+      return cb(err);
+    }
+
+    logger.info("_editGuide success");
+    return cb(err);
   });
 }

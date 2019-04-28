@@ -72,5 +72,14 @@ module.exports = {
   },
   'TIMEOUT': {
     'cookie': 300000
-  }
+  },
+  'GUIDE_ATTR': [
+    'Name',
+    'Address',
+    'Phone',
+    'WebSite',
+    'WebChat',
+    'Tips',
+    'RoadMap'
+  ]
 };
