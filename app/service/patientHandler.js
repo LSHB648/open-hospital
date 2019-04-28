@@ -16,7 +16,7 @@ patientHandler.getHandler = () => {
   handler[constx.ACTION.getUser] = patientHandler.getUser;
   handler[constx.ACTION.editUser] = editUser;
   handler[constx.ACTION.logIn] = adminHandler.logIn;
-  handler[constx.ACTION.logOut] = logOut;
+  handler[constx.ACTION.logOut] = adminHandler.logOut;
   handler[constx.ACTION.getDepartment] = getDepartment;
   handler[constx.ACTION.listDepartment] = listDepartment;
   handler[constx.ACTION.listSchedule] = listSchedule;
@@ -187,10 +187,6 @@ function editUser(req) {
       return req.conn.sendText(response.getStr(req, 200));
     }
   });
-}
-
-function logOut(req) {
-  return;
 }
 
 function getDepartment(req) {

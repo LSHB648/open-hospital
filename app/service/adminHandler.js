@@ -271,7 +271,7 @@ adminHandler.logIn = (req) => {
   });
 }
 
-function logOut(req) {
+adminHandler.logOut = (req) => {
   async.waterfall([
     (func) => {
       var ckDec = cookieService.decode(req.msg.Cookie);
