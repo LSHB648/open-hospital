@@ -15,7 +15,7 @@ adminHandler.getHandler = () => {
   handler[constx.ACTION.deRegisterUser] = deRegisterUser;
   handler[constx.ACTION.listUser] = listUser;
   handler[constx.ACTION.logIn] = adminHandler.logIn;
-  handler[constx.ACTION.logOut] = logOut;
+  handler[constx.ACTION.logOut] = adminHandler.logOut;
   handler[constx.ACTION.registerDepartment] = registerDepartment;
   handler[constx.ACTION.deRegisterDepartment] = deRegisterDepartment;
   handler[constx.ACTION.getDepartment] = getDepartment;
