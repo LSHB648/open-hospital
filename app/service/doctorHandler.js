@@ -6,6 +6,8 @@ var cookieService = require('./cookieService');
 var wsConnService = require('./wsConnService');
 var patientHandler = require('./patientHandler');
 var registrationDao = require('../dao/registrationDao');
+var prescriptionDao = require('../dao/prescriptionDao');
+var dpDocDao = require('../dao/dpDocDao');
 var adminHandler = require('./adminHandler');
 var logger = require('../log/logger').getLogger('main');
 
@@ -150,7 +152,63 @@ function callRegistration(req) {
 }
 
 function addPrescription(req) {
-  return;
+  if (!req.msg.hasOwnProperty('UserId')) {
+    logger.error("req para UserId not found");
+    req.paraName = 'UserId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (!req.msg.hasOwnProperty('Content')) {
+    logger.error("req para Content not found");
+    req.paraName = 'Content';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  if (req.msg.Content.length < 1 || req.msg.Content.length > 254) {
+    logger.error("req paraVal Content error");
+    req.paraName = 'Content';
+    req.paraVal = req.msg.Content;
+    return req.conn.sendText(response.getStr(req, 404));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      req.msg.doctorId = ckDec.userId;
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      dpDocDao.getByDoctorId(req.msg.doctorId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req doctor not found");
+        return req.conn.sendText(response.getStr(req, 407));
+      }
+
+      var pre = {};
+      pre.userId = req.msg.UserId;
+      pre.departmentId = res.department_id;
+      pre.doctorId = req.msg.doctorId;
+      pre.content = req.msg.Content;
+
+      prescriptionDao.add(req.msg.UserId, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("addPrescription internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("addPrescription success");;
+    return req.conn.sendText(response.getStr(req, 200));
+  });
 }
 
 function listPrescription(req) {
