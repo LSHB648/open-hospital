@@ -51,7 +51,7 @@ webService.start = () => {
       }
 
       req.action = req.msg.Action;
-      req.userType = __getUserType(req);
+      req.userType = _getUserType(req);
 
       if (req.userType === false) {
         logger.error("req userType unknown");
@@ -77,7 +77,7 @@ webService.start = () => {
   }).listen(app['listenPort']);
 };
 
-function __getUserType(req) {
+function _getUserType(req) {
   // 注册用户的操作，而且要注册的用户类型是门诊用户，则判定请求用户为门诊用户
   if (req.action === constx.ACTION.registerUser && req.msg.Type === constx.USER_TYPE.patient) {
     return constx.USER_TYPE.patient;
@@ -86,7 +86,7 @@ function __getUserType(req) {
   // 其他操作基于cookie来识别用户类型
   var cookie = req.msg.Cookie;
   if (cookie === undefined) {
-    logger.error("__getUserType Cookie not found");
+    logger.error("_getUserType Cookie not found");
 
     req.code = 403;
     req.paraName = 'Cookie';
@@ -95,7 +95,7 @@ function __getUserType(req) {
 
   var ckDec = cookieService.decode(cookie);
   if (ckDec === false) {
-    logger.error("__getUserType Cookie error");
+    logger.error("_getUserType Cookie error");
 
     req.code = 404;
     req.paraName = 'Cookie';

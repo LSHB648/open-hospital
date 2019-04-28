@@ -22,31 +22,31 @@ app.loadConfig = (key, cfg) => {
 };
 
 app.init = () => {
-  var args = __getOptions(process.argv);
+  var args = _getOptions(process.argv);
 
   if (args.help) {
     app['help'] = true;
-    logger.info("__getOptions help found");
+    logger.info("_getOptions help found");
     return true;
   }
 
   if (args.env === undefined) {
-    logger.error("__getOptions no env= found");
+    logger.error("_getOptions no env= found");
     return false;
   }
 
   if (args.listenPort === undefined) {
-    logger.error("__getOptions no listenPort= found");
+    logger.error("_getOptions no listenPort= found");
     return false;
   }
 
   if (args.enable === undefined) {
-    logger.error("__getOptions no enable= found");
+    logger.error("_getOptions no enable= found");
     return false;
   }
 
   if (isNaN(parseInt(args.listenPort))) {
-    logger.error("__getOptions listenPort must be int");
+    logger.error("_getOptions listenPort must be int");
     return false;
   }
 
@@ -67,7 +67,7 @@ app.init = () => {
   return true;
 };
 
-function __getOptions(args) {
+function _getOptions(args) {
   var argsMap = {};
   var appPos = 1;
 

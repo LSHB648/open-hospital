@@ -10,7 +10,7 @@ mysqlService.init = (config) => {
     return;
   }
 
-  __init(config);
+  _init(config);
 };
 
 mysqlService.query = (sql, args, cb) => {
@@ -41,7 +41,7 @@ mysqlService.shutdown = () => {
   connPool.destroyAllNow();
 };
 
-function __init(config) {
+function _init(config) {
   connPool = mysql.createPool({
     connectionLimit: CONN_LIMIT,
     host: config.host,

@@ -6,6 +6,7 @@ var redisService = require('../dao/redisService');
 var cookieService = require('./cookieService');
 var userDao = require('../dao/userDao');
 var departmentDao = require('../dao/departmentDao');
+var dpDocDao = require('../dao/dpDocDao');
 var logger = require('../log/logger').getLogger('main');
 
 var adminHandler = module.exports;
@@ -411,7 +412,47 @@ function deRegisterDepartment(req) {
 }
 
 function getDepartment(req) {
-  return;
+  if (!req.msg.hasOwnProperty('DepartmentId')) {
+    logger.error("req para DepartmentId not found");
+    req.paraName = 'DepartmentId';
+    return req.conn.sendText(response.getStr(req, 403));
+  }
+
+  async.waterfall([
+    (func) => {
+      var ckDec = cookieService.decode(req.msg.Cookie);
+      var key = constx.PREFIX.cookieCache + ckDec.userId;
+
+      redisService.getKey(key, func);
+
+    }, (cookie, func) => {
+      if (cookie !== req.msg.Cookie) {
+        logger.error("req para Cookie wrong or expired");
+        return req.conn.sendText(response.getStr(req, 408));
+      }
+
+      departmentDao.getById(req.msg.DepartmentId, func);
+    }, (res, func) => {
+      if (!res) {
+        logger.error("req resource DepartmentId not found");
+        req.rid = req.msg.DepartmentId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
+      _getDepartmentDetail(req.msg.DepartmentId, func);
+    }
+  ], (err, res) => {
+    if (!!err) {
+      logger.error("getDepartment internal error = %s", err);
+      return req.conn.sendText(response.getStr(req, 407));
+    }
+
+    logger.info("getDepartment success");
+
+    var ret = response.getJson(req, 200);
+    ret.Department = res;
+    return req.conn.sendText(JSON.stringify(ret));
+  });
 }
 
 function editDepartment(req) {
@@ -448,4 +489,56 @@ function editGuide(req) {
 
 function getGuide(req) {
   return;
+}
+
+function _getDepartmentDetail(id, cb) {
+  var dp = {};
+
+  async.waterfall([
+    (func) => {
+      departmentDao.getById(id, func);
+
+    }, (res, func) => {
+      dp.Id = res.id;
+      dp.Name = res.name;
+      dp.Description = res.description;
+      dp.Doctors = [];
+
+      dpDocDao.getByDepartmentId(id, func);
+
+    }, (res, func) => {
+      async.each(res, (dd, next) => {
+        userDao.getById(dd.doctor_id, (err, user) => {
+          if (!!err) {
+            logger.error("userDao.getById error = %j", err);
+            return next(err);
+          }
+
+          if (!user) {
+            logger.error("userDao.getById not found");
+            return next("doctor_id not found");
+          }
+
+          var elem = {};
+          elem.Id = user.id;
+          elem.Name = user.name;
+          elem.Type = user.type;
+          elem.RealName = user.real_name;
+          elem.Description = user.description;
+          elem.CardNumber = user.card_number;
+
+          dp.Doctors.push(elem);
+          return next(null);
+        });
+      }, func);
+    }
+  ], (err) => {
+    if (!!err) {
+      logger.error("_getDepartmentDetail internal error = %s", err);
+      return cb(err, null);
+    }
+
+    logger.info("_getDepartmentDetail success");
+    return cb(err, dp);
+  });
 }
