@@ -32,7 +32,13 @@ userDao.getByName = (name, cb) => {
 
   var args = [name];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 userDao.getById = (id, cb) => {
