@@ -620,8 +620,8 @@ function addDoctor(req) {
         return req.conn.sendText(response.getStr(req, 406));
       }
 
-      if (res.type !== constx.USER_TYPE.patient) {
-        logger.error("req user type not patient");
+      if (res.type !== constx.USER_TYPE.doctor) {
+        logger.error("req user type not doctor");
         return req.conn.sendText(response.getStr(req, 408));
       }
 

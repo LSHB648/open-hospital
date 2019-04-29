@@ -27,7 +27,13 @@ departmentDao.getById = (id, cb) => {
 
   var args = [id];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 departmentDao.getByName = (name, cb) => {
@@ -35,7 +41,13 @@ departmentDao.getByName = (name, cb) => {
 
   var args = [name];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 departmentDao.deleteById = (id, cb) => {

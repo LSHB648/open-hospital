@@ -24,7 +24,13 @@ guideDao.getByKey = (key, cb) => {
 
   var args = [key];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 guideDao.getAll = (cb) => {

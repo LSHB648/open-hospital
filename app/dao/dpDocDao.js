@@ -24,7 +24,13 @@ dpDocDao.getByDoctorId = (id, cb) => {
 
   var args = [id];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 dpDocDao.getByDDId = (departmentId, doctorId, cb) => {
@@ -32,7 +38,13 @@ dpDocDao.getByDDId = (departmentId, doctorId, cb) => {
 
   var args = [departmentId, doctorId];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 dpDocDao.deleteByDoctorId = (id, cb) => {

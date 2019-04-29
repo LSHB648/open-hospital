@@ -39,7 +39,13 @@ registrationDao.getByRegIdUid = (reg, cb) => {
 
   var args = [reg.userId, reg.id];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 registrationDao.getByRegIdDid = (reg, cb) => {
@@ -47,7 +53,13 @@ registrationDao.getByRegIdDid = (reg, cb) => {
 
   var args = [reg.doctorId, reg.id];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };
 
 registrationDao.deleteById = (id, cb) => {
