@@ -14,17 +14,17 @@ var handler = {};
 webService.start = () => {
   if (app['enable'].indexOf(constx.MODULE_TYPE.admin) !== -1) {
     logger.info("webService enable admin module now");
-    handler[constx.MODULE_TYPE.admin] = adminHandler.getHandler();
+    handler[constx.USER_TYPE.admin] = adminHandler.getHandler();
   }
 
   if (app['enable'].indexOf(constx.MODULE_TYPE.patient) !== -1) {
     logger.info("webService enable patient module now");
-    handler[constx.MODULE_TYPE.patient] = patientHandler.getHandler();
+    handler[constx.USER_TYPE.patient] = patientHandler.getHandler();
   }
 
   if (app['enable'].indexOf(constx.MODULE_TYPE.doctor) !== -1) {
     logger.info("webService enable doctor module now");
-    handler[constx.MODULE_TYPE.doctor] = doctorHandler.getHandler();
+    handler[constx.USER_TYPE.doctor] = doctorHandler.getHandler();
   }
 
   ws.createServer((conn) => {
