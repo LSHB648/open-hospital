@@ -6,6 +6,7 @@ var patientHandler = require('./patientHandler');
 var doctorHandler = require('./doctorHandler');
 var response = require('../util/response');
 var cookieService = require('./cookieService');
+var wsConnService = require('./wsConnService');
 var logger = require('../log/logger').getLogger('main');
 
 var webService = module.exports;
@@ -121,5 +122,8 @@ function _getUserType(req) {
     return false;
   }
 
+  // 更新客户端与连接的映射关系
+  req.userId = ckDec.userId;
+  wsConnService.set(req);
   return ckDec.userType;
 }
