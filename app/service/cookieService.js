@@ -8,7 +8,7 @@ cookieService.create = (userType, userId) => {
 
   // 标准格式:
   // UserType={userType}&&UserId={userId}&&Random={key}
-  ckAscii = "UserType=" + userType + "&&UserId=" + userId + "Random=" + uuid.v4();
+  ckAscii = "UserType=" + userType + "&&UserId=" + userId + "&&Random=" + uuid.v4();
 
   return Buffer.from(ckAscii).toString('base64');
 };
