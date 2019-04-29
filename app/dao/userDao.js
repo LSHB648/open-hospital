@@ -90,5 +90,11 @@ userDao.getLogIn = (user, cb) => {
 
   var args = [user.name, user.password, user.type];
 
-  mysqlService.query(sql, args, cb);
+  mysqlService.query(sql, args, (err, res) => {
+    if (!!err) {
+      return cb(err, null);
+    }
+
+    return cb(err, res[0]);
+  });
 };

@@ -249,7 +249,7 @@ adminHandler.logIn = (req) => {
       user.password = req.msg.PassWord;
       user.type = req.msg.Type;
 
-      userDao.getLogIn(req.msg.Name, func);
+      userDao.getLogIn(user, func);
     }, (res, func) => {
       if (!res) {
         logger.error("req logIn not found");
@@ -257,7 +257,7 @@ adminHandler.logIn = (req) => {
       }
 
       var key = constx.PREFIX.cookieCache + res.id;
-      var cookie = cookieService.create(req.msg.Type, res.id, func);
+      var cookie = cookieService.create(res.type, res.id, func);
       req.msg.Cookie = cookie;
       redisService.setKeyExpire(key, cookie, constx.TIMEOUT.cookie, func);
     }
