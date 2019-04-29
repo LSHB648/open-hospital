@@ -17,7 +17,7 @@ CREATE TABLE `oh_user` (
 ) ENGINE=InnoDB,CHARACTER SET=utf8;
 
 INSERT INTO `oh_user` (id, name, password, type, real_name, description, card_number, create_time, update_time) VALUES \
-                      ("fafa01f4-8357-4da7-95aa-c852bee805e8", "admin", "admin", "Admin", "系统管理员", ""， "", 1548657435588, 1548657435588);
+                      ("fafa01f4-8357-4da7-95aa-c852bee805e8", "admin", "admin", "Admin", "系统管理员", "", "", 1548657435588, 1548657435588);
 
 DROP TABLE IF EXISTS `oh_department`;
 CREATE TABLE `oh_department` (
