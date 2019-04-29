@@ -27,19 +27,19 @@ cookieService.decode = (ckEnc) => {
   }
 
   var userType = andArray[0].split('=');
-  if (userType.length != 2) {
+  if (userType.length != 2 || userType[0] !== "UserType") {
     logger.error("ckAscii userType error, ckAscii = %s", ckAscii);
     return false;
   }
 
   var userId = andArray[1].split('=');
-  if (userId.length != 2) {
+  if (userId.length != 2 || userId[0] !== "UserId") {
     logger.error("ckAscii userId error, ckAscii = %s", ckAscii);
     return false;
   }
 
   var random = andArray[2].split('=');
-  if (random.length != 2) {
+  if (random.length != 2 || random[0] !== "Random") {
     logger.error("ckAscii random error, ckAscii = %s", ckAscii);
     return false;
   }
