@@ -83,6 +83,24 @@ function _getUserType(req) {
     return constx.USER_TYPE.patient;
   }
 
+  // 登录操作，返回Type字段的值
+  if (req.action === constx.ACTION.logIn &&
+    (req.msg.Type === constx.USER_TYPE.admin ||
+      req.msg.Type === constx.USER_TYPE.patient ||
+      req.msg.Type === constx.USER_TYPE.doctor)) {
+    return req.msg.Type;
+  }
+
+  // 登录操作，Type字段非法
+  if (req.action === constx.ACTION.logIn) {
+    logger.error("_getUserType LogIn Type error");
+
+    req.code = 404;
+    req.paraName = 'Type';
+    req.paraVal = req.msg.Type;
+    return false;
+  }
+
   // 其他操作基于cookie来识别用户类型
   var cookie = req.msg.Cookie;
   if (cookie === undefined) {
