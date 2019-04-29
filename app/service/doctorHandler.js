@@ -91,7 +91,7 @@ function callRegistration(req) {
       var ckDec = cookieService.decode(req.msg.Cookie);
       var key = constx.PREFIX.cookieCache + ckDec.userId;
 
-      req.msg.UserId = ckDec.userId;
+      req.msg.DoctorId = ckDec.userId;
       redisService.getKey(key, func);
 
     }, (cookie, func) => {
@@ -104,9 +104,9 @@ function callRegistration(req) {
 
       var reg = {};
       reg.id = req.msg.RegistrationId;
-      reg.userId = req.msg.UserId;
+      reg.doctorId = req.msg.DoctorId;
 
-      registrationDao.getByRegIdUid(reg, func);
+      registrationDao.getByRegIdDid(reg, func);
     }, (res, func) => {
       if (!res) {
         logger.error("req registration not exists");
@@ -119,9 +119,14 @@ function callRegistration(req) {
         return req.conn.sendText(response.getStr(req, 408));
       }
 
-      func(null, res);
+      req.msg.Reg = res;
+
+      var reg = {};
+      reg.id = req.msg.RegistrationId;
+      reg.status = constx.REG_STATUS.working;
+      registrationDao.updateStatus(reg, func);
     }
-  ], (err, res) => {
+  ], (err) => {
     if (!!err) {
       logger.error("callRegistration internal error = %s", err);
       return req.conn.sendText(response.getStr(req, 407));
@@ -131,23 +136,28 @@ function callRegistration(req) {
       req.conn.sendText(response.getStr(req, 200));
 
       // 主动推送叫号信息给门诊用户
-      req.userId = res.user_id;
+      req.userId = req.msg.Reg.user_id;
       var conn = wsConnService.get(req);
 
       // 组装挂号信息
       var reg = {};
-      reg.Id = res.id;
-      reg.UserId = res.user_id;
-      reg.DepartmentId = res.department_id;
-      reg.DoctorId = res.doctor_id;
-      reg.status = res.status;
+      reg.Id = req.msg.Reg.id;
+      reg.UserId = req.msg.Reg.user_id;
+      reg.DepartmentId = req.msg.Reg.department_id;
+      reg.DoctorId = req.msg.Reg.doctor_id;
+      reg.status = constx.REG_STATUS.working;
 
       // 组装响应
       req.category = constx.RES_CATEGORY.push;
       var ret = response.getJson(req, 200);
       ret.Registration = reg;
 
-      return conn.sendText(JSON.stringify(ret));
+      try {
+        return conn.sendText(JSON.stringify(ret));
+
+      } catch (e) {
+        logger.error("req push error, error = %j", e);
+      }
     }
   });
 }
