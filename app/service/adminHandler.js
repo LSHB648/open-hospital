@@ -797,8 +797,8 @@ function removeSchedule(req) {
     }, (res, func) => {
       if (!res) {
         logger.error("req resource not found");
-        req.resource = req.msg.UserId;
-        return req.conn.sendText(response.getStr(req, 405));
+        req.rid = req.msg.UserId;
+        return req.conn.sendText(response.getStr(req, 406));
       }
 
       scheduleDao.deleteByDoctorId(req.msg.UserId, func);
