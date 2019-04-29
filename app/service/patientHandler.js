@@ -530,7 +530,7 @@ function onlinePay(req) {
 
       chargeDao.updateStatus(cha, func);
     }
-  ], (err, res) => {
+  ], (err) => {
     if (!!err) {
       logger.error("onlinePay internal error = %s", err);
       return req.conn.sendText(response.getStr(req, 407));

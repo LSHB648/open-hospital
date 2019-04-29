@@ -293,7 +293,7 @@ function addCharge(req) {
     return req.conn.sendText(response.getStr(req, 403));
   }
 
-  if (typeof(req.msg.ExamFee) !== 'number' || req.msg.ExamFee <= 0) {
+  if (typeof(req.msg.ExamFee) !== 'number' || req.msg.ExamFee <= 0 || req.msg.ExamFee % 1 !== 0) {
     logger.error("req paraVal ExamFee wrong");
     req.paraName = 'ExamFee';
     req.paraVal = req.msg.ExamFee;
@@ -306,7 +306,7 @@ function addCharge(req) {
     return req.conn.sendText(response.getStr(req, 403));
   }
 
-  if (typeof(req.msg.MedcFee) !== 'number' || req.msg.MedcFee <= 0) {
+  if (typeof(req.msg.MedcFee) !== 'number' || req.msg.MedcFee <= 0 || req.msg.MedcFee % 1 !== 0) {
     logger.error("req paraVal MedcFee wrong");
     req.paraName = 'MedcFee';
     req.paraVal = req.msg.MedcFee;
@@ -319,7 +319,7 @@ function addCharge(req) {
     return req.conn.sendText(response.getStr(req, 403));
   }
 
-  if (typeof(req.msg.TotalFee) !== 'number' || req.msg.TotalFee <= 0) {
+  if (typeof(req.msg.TotalFee) !== 'number' || req.msg.TotalFee <= 0 || req.msg.TotalFee % 1 !== 0) {
     logger.error("req paraVal TotalFee wrong");
     req.paraName = 'TotalFee';
     req.paraVal = req.msg.TotalFee;
