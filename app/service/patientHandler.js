@@ -235,7 +235,7 @@ function addRegistration(req) {
 
       registrationDao.getOnGoing(reg, func);
     }, (res, func) => {
-      if (!!res) {
+      if (res.length > 0) {
         logger.error("req already have registration");
         return req.conn.sendText(response.getStr(req, 408));
       }
