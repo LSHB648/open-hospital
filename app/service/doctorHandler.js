@@ -7,6 +7,7 @@ var wsConnService = require('./wsConnService');
 var patientHandler = require('./patientHandler');
 var registrationDao = require('../dao/registrationDao');
 var prescriptionDao = require('../dao/prescriptionDao');
+var userDao = require('../dao/userDao');
 var dpDocDao = require('../dao/dpDocDao');
 var chargeDao = require('../dao/chargeDao');
 var adminHandler = require('./adminHandler');
@@ -203,15 +204,25 @@ function addPrescription(req) {
         return req.conn.sendText(response.getStr(req, 407));
       }
 
+      req.msg.DepartmentId = res.department_id;
+
+      userDao.getById(req.msg.UserId, func);
+    }, (res, func) => {
+      if (!res || res.type !== constx.USER_TYPE.patient) {
+        logger.error("req userId not found or type error");
+        req.rid = req.msg.UserId;
+        return req.conn.sendText(response.getStr(req, 406));
+      }
+
       var pre = {};
       pre.userId = req.msg.UserId;
-      pre.departmentId = res.department_id;
+      pre.departmentId = req.msg.DepartmentId;
       pre.doctorId = req.msg.DoctorId;
       pre.content = req.msg.Content;
 
-      prescriptionDao.add(req.msg.UserId, func);
+      prescriptionDao.add(pre, func);
     }
-  ], (err, res) => {
+  ], (err) => {
     if (!!err) {
       logger.error("addPrescription internal error = %s", err);
       return req.conn.sendText(response.getStr(req, 407));
