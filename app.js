@@ -24,7 +24,6 @@ if (ret === false) {
   shutdown(() => {
     process.exit(2);
   });
-
   return;
 }
 
@@ -57,7 +56,6 @@ if (ret === false) {
   shutdown(() => {
     process.exit(2);
   });
-
   return;
 }
 

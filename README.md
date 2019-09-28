@@ -36,7 +36,7 @@ npm install
 ```
 bash ./misc/db_init.sh
 ```
-
+8. 上传git
 
 ### 使用方式
 

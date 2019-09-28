@@ -12,7 +12,6 @@ registrationDao.add = (reg, cb) => {
               '(id, user_id, department_id, doctor_id, status, ' +
               'create_time, update_time) ' + 
               'VALUES (?, ?, ?, ?, ?, ?, ?)';
-
   var args = [
     id,
     reg.userId,

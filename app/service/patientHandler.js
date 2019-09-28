@@ -245,7 +245,7 @@ function addRegistration(req) {
       reg.departmentId = req.msg.DepartmentId;
       reg.doctorId = req.msg.DoctorId;
       reg.status = constx.REG_STATUS.waiting;
-
+      
       registrationDao.add(reg, func);
     }
   ], (err) => {

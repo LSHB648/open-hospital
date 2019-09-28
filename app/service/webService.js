@@ -50,7 +50,7 @@ webService.start = () => {
         req.paraName = 'Action';
         return conn.sendText(response.getStr(req, 403));
       }
-
+      
       req.action = req.msg.Action;
       req.userType = _getUserType(req);
 
