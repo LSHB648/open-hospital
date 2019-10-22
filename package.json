@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": false,
   "dependencies": {
-    "mysql": "2.3.2",
+    "mysql": "2.17.1",
     "async": "2.0.1",
     "node-uuid": "1.4.1",
     "log4js": "3.0.1",
